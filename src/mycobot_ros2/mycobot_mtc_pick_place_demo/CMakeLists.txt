@@ -121,11 +121,16 @@ add_executable(mtc_node src/mtc_node.cpp)
 ament_target_dependencies(mtc_node ${dependencies})
 target_link_libraries(mtc_node get_planning_scene_client)
 
+## mtc_grasp_pose_node
+add_executable(mtc_grasp_pose_node src/mtc_grasp_pose_node.cpp)
+ament_target_dependencies(mtc_grasp_pose_node ${dependencies})
+
 # Installation
 set(EXECUTABLES
   get_planning_scene_client_node
   get_planning_scene_server
   mtc_node
+  mtc_grasp_pose_node
 )
 
 set(LIBRARIES
