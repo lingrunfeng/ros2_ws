@@ -1,0 +1,214 @@
+[0.687s] colcon.colcon_core.package_selection WARNING Some selected packages are already built in one or more underlay workspaces:
+	'moveit_ros_planning' is in: /opt/ros/jazzy
+	'moveit_simple_controller_manager' is in: /opt/ros/jazzy
+	'moveit_configs_utils' is in: /opt/ros/jazzy
+	'moveit_kinematics' is in: /opt/ros/jazzy
+	'moveit_planners' is in: /opt/ros/jazzy
+	'moveit_ros_move_group' is in: /opt/ros/jazzy
+	'moveit_ros_planning_interface' is in: /opt/ros/jazzy
+	'moveit_ros_visualization' is in: /opt/ros/jazzy
+	'moveit_common' is in: /opt/ros/jazzy
+	'moveit_core' is in: /opt/ros/jazzy
+	'moveit_ros_warehouse' is in: /opt/ros/jazzy
+If a package in a merged underlay workspace is overridden and it installs headers, then all packages in the overlay must sort their include directories by workspace order. Failure to do so may result in build failures or undefined behavior at run time.
+If the overridden package is used by another package in any underlay, then the overriding package in the overlay must be API and ABI compatible or undefined behavior at run time may occur.
+
+If you understand the risks and want to override a package anyways, add the following to the command line:
+	--allow-overriding moveit_common moveit_configs_utils moveit_core moveit_kinematics moveit_planners moveit_ros_move_group moveit_ros_planning moveit_ros_planning_interface moveit_ros_visualization moveit_ros_warehouse moveit_simple_controller_manager
+
+This may be promoted to an error in a future release of colcon-override-check.
+Starting >>> moveit_common
+Starting >>> moveit_configs_utils
+Starting >>> moveit_resources_prbt_support
+Starting >>> mycobot_bringup
+Starting >>> mycobot_description
+Starting >>> mycobot_gazebo
+Starting >>> mycobot_interfaces
+Starting >>> mycobot_system_tests
+/usr/local/lib/python3.12/dist-packages/setuptools/_distutils/dist.py:289: UserWarning: Unknown distribution option: 'tests_require'
+  warnings.warn(msg)
+Finished <<< moveit_common [1.95s]
+Starting >>> moveit_core
+Finished <<< moveit_resources_prbt_support [4.70s]
+Finished <<< mycobot_bringup [4.74s]
+Finished <<< mycobot_description [4.92s]
+--- stderr: moveit_configs_utils
+/usr/local/lib/python3.12/dist-packages/setuptools/_distutils/dist.py:289: UserWarning: Unknown distribution option: 'tests_require'
+  warnings.warn(msg)
+---
+Finished <<< moveit_configs_utils [7.01s]
+Finished <<< mycobot_gazebo [10.8s]
+--- stderr: moveit_core
+moveit_core: You did not request a specific build type: Choosing 'Release' for maximum performance
+CMake Error at robot_state/CMakeLists.txt:25 (find_package):
+  By not providing "Findament_cmake_google_benchmark.cmake" in
+  CMAKE_MODULE_PATH this project has asked CMake to find a package
+  configuration file provided by "ament_cmake_google_benchmark", but CMake
+  did not find one.
+
+  Could not find a package configuration file provided by
+  "ament_cmake_google_benchmark" with any of the following names:
+
+    ament_cmake_google_benchmarkConfig.cmake
+    ament_cmake_google_benchmark-config.cmake
+
+  Add the installation prefix of "ament_cmake_google_benchmark" to
+  CMAKE_PREFIX_PATH or set "ament_cmake_google_benchmark_DIR" to a directory
+  containing one of the above files.  If "ament_cmake_google_benchmark"
+  provides a separate development package or SDK, be sure it has been
+  installed.
+
+
+---
+Failed   <<< moveit_core [9.89s, exited with code 1]
+Aborted  <<< mycobot_interfaces [16.9s]
+Aborted  <<< mycobot_system_tests [21.3s]
+
+Summary: 6 packages finished [22.0s]
+  1 package failed: moveit_core
+  2 packages aborted: mycobot_interfaces mycobot_system_tests
+  2 packages had stderr output: moveit_configs_utils moveit_core
+  42 packages not processed
+[1.638s] colcon.colcon_core.package_selection WARNING Some selected packages are already built in one or more underlay workspaces:
+	'moveit_ros_visualization' is in: /opt/ros/jazzy
+	'moveit_core' is in: /opt/ros/jazzy
+	'moveit_ros_planning' is in: /opt/ros/jazzy
+	'moveit_ros_move_group' is in: /opt/ros/jazzy
+	'moveit_ros_warehouse' is in: /opt/ros/jazzy
+	'moveit_ros_planning_interface' is in: /opt/ros/jazzy
+	'moveit_configs_utils' is in: /opt/ros/jazzy
+	'moveit_kinematics' is in: /opt/ros/jazzy
+	'moveit_planners' is in: /opt/ros/jazzy
+	'moveit_simple_controller_manager' is in: /opt/ros/jazzy
+	'moveit_common' is in: /opt/ros/jazzy
+If a package in a merged underlay workspace is overridden and it installs headers, then all packages in the overlay must sort their include directories by workspace order. Failure to do so may result in build failures or undefined behavior at run time.
+If the overridden package is used by another package in any underlay, then the overriding package in the overlay must be API and ABI compatible or undefined behavior at run time may occur.
+
+If you understand the risks and want to override a package anyways, add the following to the command line:
+	--allow-overriding moveit_common moveit_configs_utils moveit_core moveit_kinematics moveit_planners moveit_ros_move_group moveit_ros_planning moveit_ros_planning_interface moveit_ros_visualization moveit_ros_warehouse moveit_simple_controller_manager
+
+This may be promoted to an error in a future release of colcon-override-check.
+Starting >>> moveit_common
+Starting >>> moveit_configs_utils
+Starting >>> moveit_resources_prbt_support
+Starting >>> mycobot_bringup
+Starting >>> mycobot_description
+Starting >>> mycobot_gazebo
+Starting >>> mycobot_interfaces
+Starting >>> mycobot_system_tests
+/usr/local/lib/python3.12/dist-packages/setuptools/_distutils/dist.py:289: UserWarning: Unknown distribution option: 'tests_require'
+  warnings.warn(msg)
+Finished <<< moveit_common [1.29s]
+Starting >>> moveit_core
+Finished <<< moveit_resources_prbt_support [1.48s]
+Finished <<< mycobot_bringup [1.54s]
+Finished <<< mycobot_description [1.62s]
+Finished <<< mycobot_gazebo [2.16s]
+Finished <<< mycobot_system_tests [2.15s]
+Finished <<< moveit_core [2.63s]
+Starting >>> moveit_ros_occupancy_map_monitor
+Starting >>> moveit_simple_controller_manager
+Starting >>> moveit_resources_prbt_ikfast_manipulator_plugin
+Starting >>> pilz_industrial_motion_planner_testutils
+Starting >>> chomp_motion_planner
+Starting >>> moveit_planners_stomp
+Finished <<< mycobot_interfaces [4.01s]
+Finished <<< moveit_simple_controller_manager [0.76s]
+Starting >>> moveit_plugins
+Starting >>> moveit_ros_control_interface
+Finished <<< moveit_resources_prbt_ikfast_manipulator_plugin [0.95s]
+Finished <<< chomp_motion_planner [1.03s]
+Finished <<< moveit_ros_occupancy_map_monitor [1.19s]
+Finished <<< moveit_planners_stomp [1.17s]
+Finished <<< pilz_industrial_motion_planner_testutils [1.25s]
+Starting >>> moveit_planners_chomp
+Finished <<< moveit_plugins [0.64s]
+Finished <<< moveit_ros_control_interface [0.71s]
+Finished <<< moveit_planners_chomp [0.60s]
+--- stderr: moveit_configs_utils
+/usr/local/lib/python3.12/dist-packages/setuptools/_distutils/dist.py:289: UserWarning: Unknown distribution option: 'tests_require'
+  warnings.warn(msg)
+---
+Finished <<< moveit_configs_utils [7.32s]
+Starting >>> moveit_ros_planning
+Finished <<< moveit_ros_planning [1.55s]
+Starting >>> moveit_kinematics
+Starting >>> moveit_ros_warehouse
+Starting >>> moveit_ros_robot_interaction
+Starting >>> moveit_planners_ompl
+Starting >>> moveit_ros_perception
+Finished <<< moveit_ros_robot_interaction [1.27s]
+Finished <<< moveit_kinematics [1.59s]
+Starting >>> moveit_ros_move_group
+Finished <<< moveit_ros_perception [1.67s]
+Finished <<< moveit_planners_ompl [1.90s]
+[Processing: moveit_ros_move_group, moveit_ros_warehouse]
+[Processing: moveit_ros_move_group, moveit_ros_warehouse]
+[Processing: moveit_ros_move_group, moveit_ros_warehouse]
+[Processing: moveit_ros_move_group, moveit_ros_warehouse]
+Finished <<< moveit_ros_warehouse [2min 29s]
+Starting >>> moveit_ros_benchmarks
+[Processing: moveit_ros_benchmarks, moveit_ros_move_group]
+Finished <<< moveit_ros_move_group [3min 19s]
+Starting >>> moveit_ros_planning_interface
+Starting >>> moveit_resources_prbt_moveit_config
+Finished <<< moveit_resources_prbt_moveit_config [3.68s]
+Starting >>> moveit_resources_prbt_pg70_support
+Finished <<< moveit_resources_prbt_pg70_support [3.41s]
+Starting >>> pilz_industrial_motion_planner
+--- stderr: moveit_ros_benchmarks
+moveit_ros_benchmarks: You did not request a specific build type: Choosing 'Release' for maximum performance
+---
+[Processing: moveit_ros_benchmarks, moveit_ros_planning_interface, pilz_industrial_motion_planner]
+[Processing: moveit_ros_benchmarks, moveit_ros_planning_interface, pilz_industrial_motion_planner]
+[Processing: moveit_ros_benchmarks, moveit_ros_planning_interface, pilz_industrial_motion_planner]
+Finished <<< moveit_ros_benchmarks [2min 47s]
+--- stderr: moveit_ros_planning_interface
+moveit_ros_planning_interface: You did not request a specific build type: Choosing 'Release' for maximum performance
+---
+[Processing: moveit_ros_planning_interface, pilz_industrial_motion_planner]
+Finished <<< moveit_ros_planning_interface [2min 42s]
+Starting >>> moveit_ros_visualization
+Starting >>> moveit_hybrid_planning
+Starting >>> moveit_py
+Starting >>> mycobot_moveit_demos
+Starting >>> mycobot_mtc_demos
+Starting >>> mycobot_mtc_pick_place_demo
+[Processing: moveit_hybrid_planning, moveit_py, moveit_ros_visualization, mycobot_moveit_demos, mycobot_mtc_demos, mycobot_mtc_pick_place_demo, pilz_industrial_motion_planner]
+[Processing: moveit_hybrid_planning, moveit_py, moveit_ros_visualization, mycobot_moveit_demos, mycobot_mtc_demos, mycobot_mtc_pick_place_demo, pilz_industrial_motion_planner]
+[Processing: moveit_hybrid_planning, moveit_py, moveit_ros_visualization, mycobot_moveit_demos, mycobot_mtc_demos, mycobot_mtc_pick_place_demo, pilz_industrial_motion_planner]
+Finished <<< mycobot_mtc_demos [1min 41s]
+Finished <<< mycobot_moveit_demos [1min 47s]
+--- stderr: pilz_industrial_motion_planner
+pilz_industrial_motion_planner: You did not request a specific build type: Choosing 'Release' for maximum performance
+---
+[Processing: moveit_hybrid_planning, moveit_py, moveit_ros_visualization, mycobot_mtc_pick_place_demo, pilz_industrial_motion_planner]
+Finished <<< pilz_industrial_motion_planner [5min 16s]
+Starting >>> moveit_planners
+Starting >>> moveit_ros_tests
+[537.097s] colcon.colcon_cmake.task.cmake.build WARNING Could not run installation step for package 'moveit_ros_tests' because it has no 'install' target
+--- stderr: moveit_ros_tests
+moveit_ros_tests: You did not request a specific build type: Choosing 'Release' for maximum performance
+---
+Finished <<< moveit_ros_tests [3.24s]
+Finished <<< moveit_planners [3.91s]
+Starting >>> moveit_runtime
+Finished <<< moveit_runtime [2.45s]
+--- stderr: moveit_hybrid_planning
+moveit_hybrid_planning: You did not request a specific build type: Choosing 'Release' for maximum performance
+---
+[Processing: moveit_hybrid_planning, moveit_py, moveit_ros_visualization, mycobot_mtc_pick_place_demo]
+[Processing: moveit_hybrid_planning, moveit_py, moveit_ros_visualization, mycobot_mtc_pick_place_demo]
+Finished <<< moveit_hybrid_planning [3min 58s]
+--- stderr: moveit_py
+lto-wrapper: warning: using serial compilation of 3 LTRANS jobs
+lto-wrapper: note: see the ‘-flto’ option documentation for more information
+lto-wrapper: warning: using serial compilation of 2 LTRANS jobs
+lto-wrapper: note: see the ‘-flto’ option documentation for more information
+---
+[Processing: moveit_py, moveit_ros_visualization, mycobot_mtc_pick_place_demo]
+[Processing: moveit_py, moveit_ros_visualization, mycobot_mtc_pick_place_demo]
+[Processing: moveit_py, moveit_ros_visualization, mycobot_mtc_pick_place_demo]
+[Processing: moveit_py, moveit_ros_visualization, mycobot_mtc_pick_place_demo]
+[Processing: moveit_py, moveit_ros_visualization, mycobot_mtc_pick_place_demo]
+Finished <<< moveit_py [6min 49s]
