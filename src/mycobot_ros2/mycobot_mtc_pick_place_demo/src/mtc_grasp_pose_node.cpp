@@ -32,11 +32,12 @@ private:
   // MTC Task
   mtc::Task task_;
   mtc::Task createTask();
-  void doTask();
+  bool doTask();
   bool executeSolutionWithMoveGroup();
 
   // Helper
   void setupPlanningScene(const geometry_msgs::msg::PoseStamped& pose);
+  void resetAfterGrasp();
 
   // State
   geometry_msgs::msg::PoseStamped target_pose_;
@@ -101,9 +102,19 @@ void MTCGraspPoseNode::objectPoseCallback(const geometry_msgs::msg::PoseStamped:
     this->setupPlanningScene(target_pose_);
     // Wait for planning scene to synchronize (applyCollisionObjects is async)
     rclcpp::sleep_for(std::chrono::milliseconds(500));
-    this->doTask();
-    // Reset for next run if needed, or just exit
-    // has_pose_ = false; 
+    
+    bool success = this->doTask();
+    
+    if (success) {
+      RCLCPP_INFO(this->get_logger(), "Grasp completed successfully, holding for 2 seconds...");
+      rclcpp::sleep_for(std::chrono::seconds(2));
+      
+      // Reset for next grasp
+      this->resetAfterGrasp();
+    } else {
+      RCLCPP_ERROR(this->get_logger(), "Grasp failed, resetting...");
+      has_pose_ = false;  // Reset flag even on failure
+    }
   }).detach();
 }
 
@@ -303,7 +314,7 @@ mtc::Task MTCGraspPoseNode::createTask()
   return task;
 }
 
-void MTCGraspPoseNode::doTask()
+bool MTCGraspPoseNode::doTask()
 {
   task_ = createTask();
 
@@ -311,20 +322,22 @@ void MTCGraspPoseNode::doTask()
     task_.init();
   } catch (mtc::InitStageException& e) {
     RCLCPP_ERROR(this->get_logger(), "Task init failed: %s", e.what());
-    return;
+    return false;
   }
 
   if (!task_.plan(10)) {
     RCLCPP_ERROR(this->get_logger(), "Task planning failed");
-    return;
+    return false;
   }
 
   RCLCPP_INFO(this->get_logger(), "Task planning succeeded");
   task_.introspection().publishSolution(*task_.solutions().front());
 
   if (this->get_parameter("execute").as_bool()) {
-    executeSolutionWithMoveGroup();
+    return executeSolutionWithMoveGroup();
   }
+  
+  return true;
 }
 
 bool MTCGraspPoseNode::executeSolutionWithMoveGroup()
@@ -434,6 +447,101 @@ bool MTCGraspPoseNode::executeSolutionWithMoveGroup()
   } catch (const std::exception& e) {
     RCLCPP_ERROR(this->get_logger(), "Exception during execution: %s", e.what());
     return false;
+  }
+}
+
+void MTCGraspPoseNode::resetAfterGrasp()
+{
+  RCLCPP_INFO(this->get_logger(), "Resetting for next grasp...");
+  
+  try {
+    moveit::planning_interface::PlanningSceneInterface psi;
+    
+    // Step 1: Remove collision object from scene (also detaches it)
+    RCLCPP_INFO(this->get_logger(), "Removing collision object...");
+    psi.removeCollisionObjects({object_name_});
+    
+    // Wait for scene update
+    rclcpp::sleep_for(std::chrono::milliseconds(300));
+    
+    // Step 2: Create move groups
+    auto arm_group_name = this->get_parameter("arm_group_name").as_string();
+    auto gripper_group_name = this->get_parameter("gripper_group_name").as_string();
+    
+    auto arm_group = std::make_shared<moveit::planning_interface::MoveGroupInterface>(
+      shared_from_this(), arm_group_name);
+    auto gripper_group = std::make_shared<moveit::planning_interface::MoveGroupInterface>(
+      shared_from_this(), gripper_group_name);
+    
+    // Configure planning parameters for robust execution
+    arm_group->setPlanningTime(10.0);  // Give enough time to find a solution
+    arm_group->setNumPlanningAttempts(3);
+    arm_group->setMaxVelocityScalingFactor(0.5);  // Slower, safer
+    arm_group->setMaxAccelerationScalingFactor(0.5);
+    
+    // Step 3: Lift up vertically (safest universal motion)
+    RCLCPP_INFO(this->get_logger(), "Lifting arm to safe height...");
+    auto current_pose = arm_group->getCurrentPose();
+    geometry_msgs::msg::Pose safe_pose = current_pose.pose;
+    safe_pose.position.z += 0.10;  // Lift 10cm
+    
+    arm_group->setPoseTarget(safe_pose);
+    bool lift_success = (arm_group->move() == moveit::core::MoveItErrorCode::SUCCESS);
+    
+    if (!lift_success) {
+      RCLCPP_WARN(this->get_logger(), "Failed to lift arm, will try home anyway");
+    } else {
+      RCLCPP_INFO(this->get_logger(), "Lifted to safe height");
+      rclcpp::sleep_for(std::chrono::milliseconds(500));
+    }
+    
+    // Step 4: Return to home position (from elevated position, easier to plan)
+    RCLCPP_INFO(this->get_logger(), "Returning to home position...");
+    
+    // Try named target first
+    arm_group->setNamedTarget("ready");  // or "home" depending on SRDF
+    bool home_success = (arm_group->move() == moveit::core::MoveItErrorCode::SUCCESS);
+    
+    if (!home_success) {
+      RCLCPP_WARN(this->get_logger(), "Failed to reach named target 'ready', trying joint values");
+      
+      // Fallback: try safe joint configuration
+      std::vector<double> safe_home_joints = {0.0, -0.3, 0.3, 0.0, 0.3, 0.0};
+      arm_group->setJointValueTarget(safe_home_joints);
+      home_success = (arm_group->move() == moveit::core::MoveItErrorCode::SUCCESS);
+      
+      if (!home_success) {
+        RCLCPP_ERROR(this->get_logger(), 
+          "Failed to return home after multiple attempts. Staying in current position.");
+        RCLCPP_WARN(this->get_logger(), 
+          "Robot is in a safe elevated position but not at home. Can still accept new tasks.");
+      }
+    }
+    
+    if (home_success) {
+      RCLCPP_INFO(this->get_logger(), "Successfully returned to home position");
+    }
+    
+    // Step 5: Reset gripper to match MTC task initial state
+    RCLCPP_INFO(this->get_logger(), "Resetting gripper to half_closed...");
+    auto gripper_close_pose = this->get_parameter("gripper_close_pose").as_string();
+    gripper_group->setNamedTarget(gripper_close_pose);
+    
+    bool gripper_success = (gripper_group->move() == moveit::core::MoveItErrorCode::SUCCESS);
+    if (!gripper_success) {
+      RCLCPP_WARN(this->get_logger(), "Gripper reset failed, but continuing anyway");
+    }
+    
+    // Step 6: Reset flag to accept new tasks
+    has_pose_ = false;
+    
+    RCLCPP_INFO(this->get_logger(), "Reset complete! Ready for next object.");
+    
+  } catch (const std::exception& e) {
+    RCLCPP_ERROR(this->get_logger(), "Exception during reset: %s", e.what());
+    // Always reset flag to prevent system from getting stuck
+    has_pose_ = false;
+    RCLCPP_WARN(this->get_logger(), "Reset had errors but system is ready for new tasks");
   }
 }
 
